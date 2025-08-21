@@ -44,13 +44,13 @@ class ApiClient {
 
   // Authentication
   async login(credentials: LoginRequest): Promise<LoginResponse> {
-    const response: AxiosResponse<ApiResponse<LoginResponse>> = await this.client.post('/auth/login', credentials);
-    return response.data.data!;
+    const response: AxiosResponse<LoginResponse> = await this.client.post('/auth/login', credentials);
+    return response.data;
   }
 
   async register(credentials: LoginRequest): Promise<LoginResponse> {
-    const response: AxiosResponse<ApiResponse<LoginResponse>> = await this.client.post('/auth/register', credentials);
-    return response.data.data!;
+    const response: AxiosResponse<LoginResponse> = await this.client.post('/auth/register', credentials);
+    return response.data;
   }
 
   // Workflows
