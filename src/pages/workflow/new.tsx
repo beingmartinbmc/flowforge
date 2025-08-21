@@ -321,14 +321,14 @@ function WorkflowBuilder() {
 // Custom Node Components
 function HttpNode({ data }: { data: any }) {
   return (
-    <div className="px-4 py-2 shadow-md rounded-md bg-white border-2 border-stone-400">
+    <div className="px-4 py-2 shadow-md rounded-md bg-card border-2 border-border">
       <div className="flex items-center">
-        <div className="rounded-full w-12 h-12 flex items-center justify-center bg-blue-100">
+        <div className="rounded-full w-12 h-12 flex items-center justify-center bg-blue-500/20">
           🌐
         </div>
         <div className="ml-2">
-          <div className="text-lg font-bold">{data.label}</div>
-          <div className="text-gray-500">{data.config.method} {data.config.url}</div>
+          <div className="text-lg font-bold text-foreground">{data.label}</div>
+          <div className="text-muted-foreground">{data.config.method} {data.config.url}</div>
         </div>
       </div>
     </div>
@@ -337,14 +337,14 @@ function HttpNode({ data }: { data: any }) {
 
 function EchoNode({ data }: { data: any }) {
   return (
-    <div className="px-4 py-2 shadow-md rounded-md bg-white border-2 border-stone-400">
+    <div className="px-4 py-2 shadow-md rounded-md bg-card border-2 border-border">
       <div className="flex items-center">
-        <div className="rounded-full w-12 h-12 flex items-center justify-center bg-green-100">
+        <div className="rounded-full w-12 h-12 flex items-center justify-center bg-green-500/20">
           📢
         </div>
         <div className="ml-2">
-          <div className="text-lg font-bold">{data.label}</div>
-          <div className="text-gray-500">{data.config.message}</div>
+          <div className="text-lg font-bold text-foreground">{data.label}</div>
+          <div className="text-muted-foreground">{data.config.message}</div>
         </div>
       </div>
     </div>
@@ -353,14 +353,14 @@ function EchoNode({ data }: { data: any }) {
 
 function CustomNode({ data }: { data: any }) {
   return (
-    <div className="px-4 py-2 shadow-md rounded-md bg-white border-2 border-stone-400">
+    <div className="px-4 py-2 shadow-md rounded-md bg-card border-2 border-border">
       <div className="flex items-center">
-        <div className="rounded-full w-12 h-12 flex items-center justify-center bg-purple-100">
+        <div className="rounded-full w-12 h-12 flex items-center justify-center bg-purple-500/20">
           ⚙️
         </div>
         <div className="ml-2">
-          <div className="text-lg font-bold">{data.label}</div>
-          <div className="text-gray-500">Custom Code</div>
+          <div className="text-lg font-bold text-foreground">{data.label}</div>
+          <div className="text-muted-foreground">Custom Code</div>
         </div>
       </div>
     </div>
