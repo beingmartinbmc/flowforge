@@ -488,15 +488,16 @@ function RunDetail() {
                 <CardTitle>Task Details</CardTitle>
               </CardHeader>
               <CardContent>
-                <Table>
+                <div className="overflow-x-auto">
+                  <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Task ID</TableHead>
-                      <TableHead>Node</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead>Attempts</TableHead>
-                      <TableHead>Duration</TableHead>
-                      <TableHead>Error</TableHead>
+                      <TableHead className="w-[200px]">Task ID</TableHead>
+                      <TableHead className="w-[150px]">Node</TableHead>
+                      <TableHead className="w-[100px]">Status</TableHead>
+                      <TableHead className="w-[100px]">Attempts</TableHead>
+                      <TableHead className="w-[120px]">Duration</TableHead>
+                      <TableHead className="w-[200px]">Error</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -521,6 +522,7 @@ function RunDetail() {
                     ))}
                   </TableBody>
                 </Table>
+                </div>
               </CardContent>
             </Card>
           </TabsContent>

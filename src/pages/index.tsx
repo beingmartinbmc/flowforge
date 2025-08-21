@@ -307,16 +307,16 @@ export default function Dashboard() {
               </div>
 
               {/* Table */}
-              <div className="rounded-md border">
+              <div className="rounded-md border min-w-full overflow-x-auto">
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Workflow Name</TableHead>
-                      <TableHead>Run ID</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead>Started At</TableHead>
-                      <TableHead>Duration</TableHead>
-                      <TableHead>Actions</TableHead>
+                      <TableHead className="w-[200px]">Workflow Name</TableHead>
+                      <TableHead className="w-[200px]">Run ID</TableHead>
+                      <TableHead className="w-[100px]">Status</TableHead>
+                      <TableHead className="w-[180px]">Started At</TableHead>
+                      <TableHead className="w-[120px]">Duration</TableHead>
+                      <TableHead className="w-[80px]">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
