@@ -55,10 +55,14 @@ class ApiClient {
 
   // Workflows
   async getWorkflows(page: number = 1, limit: number = 10): Promise<PaginatedResponse<WorkflowDefinition>> {
-    const response: AxiosResponse<PaginatedResponse<WorkflowDefinition>> = await this.client.get('/workflows', {
+    const response: AxiosResponse<{ workflows: WorkflowDefinition[], pagination: any }> = await this.client.get('/workflows', {
       params: { page, limit },
     });
-    return response.data;
+    // Transform backend response to match frontend expected structure
+    return {
+      data: response.data.workflows,
+      pagination: response.data.pagination,
+    };
   }
 
   async getWorkflow(id: string): Promise<WorkflowDefinition> {
@@ -90,8 +94,12 @@ class ApiClient {
     const params: any = { page, limit };
     if (workflowId) params.workflowId = workflowId;
     
-    const response: AxiosResponse<PaginatedResponse<Run>> = await this.client.get('/runs', { params });
-    return response.data;
+    const response: AxiosResponse<{ runs: Run[], pagination: any }> = await this.client.get('/runs', { params });
+    // Transform backend response to match frontend expected structure
+    return {
+      data: response.data.runs,
+      pagination: response.data.pagination,
+    };
   }
 
   async getRun(id: string): Promise<Run> {
