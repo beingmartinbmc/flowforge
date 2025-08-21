@@ -339,7 +339,7 @@ export default function Dashboard() {
                             {run.workflow?.name || 'Unknown'}
                           </TableCell>
                           <TableCell className="font-mono text-sm">
-                            {run.id.slice(0, 8)}...
+                            {run.id}
                           </TableCell>
                           <TableCell>
                             {getStatusBadge(run.status)}

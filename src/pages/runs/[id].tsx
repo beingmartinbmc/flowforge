@@ -460,7 +460,7 @@ function RunDetail() {
                     {tasks.map((task) => (
                       <TableRow key={task.id}>
                         <TableCell className="font-mono text-sm">
-                          {task.id.slice(0, 8)}...
+                          {task.id}
                         </TableCell>
                         <TableCell>{task.nodeName || task.nodeId}</TableCell>
                         <TableCell>{getStatusBadge(task.status)}</TableCell>

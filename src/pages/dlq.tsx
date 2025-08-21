@@ -364,7 +364,7 @@ export default function DeadLetterQueue() {
                       filteredTasks.map((task) => (
                         <TableRow key={task.id}>
                           <TableCell className="font-mono text-sm">
-                            {task.id.slice(0, 8)}...
+                            {task.id}
                           </TableCell>
                           <TableCell className="font-medium">
                             {task.workflowName}
