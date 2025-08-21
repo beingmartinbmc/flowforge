@@ -44,6 +44,8 @@ const nodeTypes: NodeTypes = {
   http: HttpNode,
   echo: EchoNode,
   custom: CustomNode,
+  start: StartNode,
+  end: EndNode,
 };
 
 const initialNodes: Node[] = [
@@ -86,24 +88,51 @@ function WorkflowBuilder() {
   }, []);
 
   const addNode = (type: string) => {
+    const getLabel = (type: string) => {
+      switch (type) {
+        case 'http': return 'HTTP Request';
+        case 'echo': return 'Echo';
+        case 'custom': return 'Custom Task';
+        case 'start': return 'Start';
+        case 'end': return 'End';
+        default: return 'Task';
+      }
+    };
+
+    const getConfig = (type: string) => {
+      switch (type) {
+        case 'http':
+          return {
+            method: 'GET',
+            url: '',
+            headers: {},
+            body: null,
+            timeout: 30000,
+          };
+        case 'echo':
+          return {
+            message: 'Hello World',
+            level: 'info',
+          };
+        case 'custom':
+          return {
+            code: 'console.log("Custom task");',
+          };
+        case 'start':
+        case 'end':
+          return {};
+        default:
+          return {};
+      }
+    };
+
     const newNode: Node = {
       id: `${Date.now()}`,
       type: type as any,
       position: { x: Math.random() * 400, y: Math.random() * 400 },
       data: { 
-        label: type === 'http' ? 'HTTP Request' : type === 'echo' ? 'Echo' : 'Custom Task',
-        config: type === 'http' ? {
-          method: 'GET',
-          url: '',
-          headers: {},
-          body: null,
-          timeout: 30000,
-        } : type === 'echo' ? {
-          message: 'Hello World',
-          level: 'info',
-        } : {
-          code: 'console.log("Custom task");',
-        }
+        label: getLabel(type),
+        config: getConfig(type),
       },
     };
     setNodes((nds) => [...nds, newNode]);
@@ -273,6 +302,22 @@ function WorkflowBuilder() {
                   <Plus className="mr-2 h-4 w-4" />
                   Custom Task
                 </Button>
+                <Button
+                  variant="outline"
+                  className="w-full justify-start"
+                  onClick={() => addNode('start')}
+                >
+                  <Plus className="mr-2 h-4 w-4" />
+                  Start Node
+                </Button>
+                <Button
+                  variant="outline"
+                  className="w-full justify-start"
+                  onClick={() => addNode('end')}
+                >
+                  <Plus className="mr-2 h-4 w-4" />
+                  End Node
+                </Button>
               </CardContent>
             </Card>
 
@@ -361,6 +406,38 @@ function CustomNode({ data }: { data: any }) {
         <div className="ml-2">
           <div className="text-lg font-bold text-foreground">{data.label}</div>
           <div className="text-muted-foreground">Custom Code</div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function StartNode({ data }: { data: any }) {
+  return (
+    <div className="px-4 py-2 shadow-md rounded-md bg-card border-2 border-green-500">
+      <div className="flex items-center">
+        <div className="rounded-full w-12 h-12 flex items-center justify-center bg-green-500/20">
+          ▶️
+        </div>
+        <div className="ml-2">
+          <div className="text-lg font-bold text-foreground">{data.label}</div>
+          <div className="text-muted-foreground">Workflow Start</div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function EndNode({ data }: { data: any }) {
+  return (
+    <div className="px-4 py-2 shadow-md rounded-md bg-card border-2 border-red-500">
+      <div className="flex items-center">
+        <div className="rounded-full w-12 h-12 flex items-center justify-center bg-red-500/20">
+          ⏹️
+        </div>
+        <div className="ml-2">
+          <div className="text-lg font-bold text-foreground">{data.label}</div>
+          <div className="text-muted-foreground">Workflow End</div>
         </div>
       </div>
     </div>

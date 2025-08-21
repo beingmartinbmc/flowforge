@@ -1,7 +1,7 @@
 // Core workflow types
 export interface WorkflowNode {
   id: string;
-  type: 'http' | 'echo' | 'custom';
+  type: 'http' | 'echo' | 'custom' | 'start' | 'end';
   name: string;
   config: Record<string, any>;
   position: { x: number; y: number };
