@@ -14,7 +14,7 @@ class ApiClient {
 
   constructor() {
     this.client = axios.create({
-      baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api',
+      baseURL: process.env.NEXT_PUBLIC_API_URL || 'https://flowforge-backend-51ca59bfd-beingmartinbmcs-projects.vercel.app/api',
       headers: {
         'Content-Type': 'application/json',
       },

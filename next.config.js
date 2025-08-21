@@ -3,22 +3,21 @@ const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
   
-  // GitHub Pages configuration
-  basePath: process.env.NODE_ENV === 'production' ? '/flowforge' : '',
-  assetPrefix: process.env.NODE_ENV === 'production' ? '/flowforge/' : '',
-  
-  // Static export for GitHub Pages
-  output: 'export',
-  trailingSlash: true,
-  
-  // Disable image optimization for static export
-  images: {
-    unoptimized: true,
-  },
+  // GitHub Pages configuration (only for production)
+  ...(process.env.NODE_ENV === 'production' && {
+    basePath: '/flowforge',
+    assetPrefix: '/flowforge/',
+    output: 'export',
+    trailingSlash: true,
+    images: {
+      unoptimized: true,
+    },
+  }),
   
   // Environment variables
   env: {
     CUSTOM_KEY: process.env.CUSTOM_KEY,
+    NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL || 'https://flowforge-backend-51ca59bfd-beingmartinbmcs-projects.vercel.app/api',
   },
 }
 

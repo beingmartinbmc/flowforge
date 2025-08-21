@@ -1,0 +1,364 @@
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/router';
+import { motion } from 'framer-motion';
+import { 
+  Plus, 
+  Play, 
+  CheckCircle, 
+  Clock, 
+  AlertCircle,
+  BarChart3,
+  Calendar,
+  Filter,
+  Search,
+  Eye,
+  RefreshCw,
+  AlertTriangle,
+  LogOut,
+  User
+} from 'lucide-react';
+import { apiClient } from '@/lib/api';
+import { Run, WorkflowDefinition } from '@/types';
+import { useAuth } from '@/contexts/AuthContext';
+import ProtectedRoute from '@/components/ProtectedRoute';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { useTheme } from 'next-themes';
+
+interface DashboardStats {
+  totalWorkflows: number;
+  totalRuns: number;
+  successRate: number;
+  avgTaskDuration: number;
+}
+
+export default function Dashboard() {
+  const router = useRouter();
+  const { theme, setTheme } = useTheme();
+  const { user, logout } = useAuth();
+  const [stats, setStats] = useState<DashboardStats>({
+    totalWorkflows: 0,
+    totalRuns: 0,
+    successRate: 0,
+    avgTaskDuration: 0,
+  });
+  const [runs, setRuns] = useState<Run[]>([]);
+  const [workflows, setWorkflows] = useState<WorkflowDefinition[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [filters, setFilters] = useState({
+    workflow: '',
+    status: '',
+    search: '',
+  });
+
+  useEffect(() => {
+    loadDashboardData();
+  }, []);
+
+  const loadDashboardData = async () => {
+    try {
+      setLoading(true);
+      const [runsData, workflowsData, systemMetrics] = await Promise.all([
+        apiClient.getRuns(undefined, 1, 10),
+        apiClient.getWorkflows(1, 100),
+        apiClient.getSystemMetrics(),
+      ]);
+
+      setRuns(runsData.data);
+      setWorkflows(workflowsData.data);
+      
+      // Calculate stats from metrics
+      setStats({
+        totalWorkflows: workflowsData.data.length,
+        totalRuns: systemMetrics.totalRuns || 0,
+        successRate: systemMetrics.successRate || 0,
+        avgTaskDuration: systemMetrics.avgTaskDuration || 0,
+      });
+    } catch (error) {
+      console.error('Failed to load dashboard data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getStatusBadge = (status: string) => {
+    const statusConfig = {
+      SUCCESS: { color: 'bg-green-500', text: 'Success' },
+      RUNNING: { color: 'bg-yellow-500', text: 'Running' },
+      FAILED: { color: 'bg-red-500', text: 'Failed' },
+      PENDING: { color: 'bg-gray-500', text: 'Pending' },
+      CANCELED: { color: 'bg-gray-400', text: 'Canceled' },
+    };
+
+    const config = statusConfig[status as keyof typeof statusConfig] || statusConfig.PENDING;
+    
+    return (
+      <Badge className={`${config.color} text-white`}>
+        {config.text}
+      </Badge>
+    );
+  };
+
+  const formatDuration = (startedAt: Date, completedAt?: Date) => {
+    if (!completedAt) return 'Running...';
+    const duration = new Date(completedAt).getTime() - new Date(startedAt).getTime();
+    const seconds = Math.floor(duration / 1000);
+    if (seconds < 60) return `${seconds}s`;
+    const minutes = Math.floor(seconds / 60);
+    return `${minutes}m ${seconds % 60}s`;
+  };
+
+  const filteredRuns = runs.filter(run => {
+    if (filters.workflow && run.workflow?.name !== filters.workflow) return false;
+    if (filters.status && run.status !== filters.status) return false;
+    if (filters.search && !run.id.toLowerCase().includes(filters.search.toLowerCase())) return false;
+    return true;
+  });
+
+  return (
+    <div className="min-h-screen bg-background">
+        {/* Header */}
+        <header className="border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+          <div className="container flex h-16 items-center justify-between">
+            <div className="flex items-center space-x-4">
+              <h1 className="text-2xl font-bold">FlowForge</h1>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+              >
+                {theme === 'dark' ? '🌞' : '🌙'}
+              </Button>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => router.push('/dlq')}
+              >
+                <AlertTriangle className="mr-2 h-4 w-4" />
+                Dead Letter Queue
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => router.push('/workflow/new')}
+              >
+                <Plus className="mr-2 h-4 w-4" />
+                Create Workflow
+              </Button>
+            </div>
+            <div className="flex items-center space-x-2">
+              <div className="flex items-center space-x-2 text-sm text-muted-foreground">
+                <User className="h-4 w-4" />
+                <span>{user?.email}</span>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={logout}
+              >
+                <LogOut className="mr-2 h-4 w-4" />
+                Logout
+              </Button>
+            </div>
+          </div>
+        </header>
+
+      <div className="container mx-auto p-6 space-y-6">
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+          >
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Total Workflows</CardTitle>
+                <BarChart3 className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{stats.totalWorkflows}</div>
+                <p className="text-xs text-muted-foreground">Active workflows</p>
+              </CardContent>
+            </Card>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+          >
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Total Runs</CardTitle>
+                <Play className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{stats.totalRuns}</div>
+                <p className="text-xs text-muted-foreground">All time executions</p>
+              </CardContent>
+            </Card>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+          >
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Success Rate</CardTitle>
+                <CheckCircle className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{stats.successRate.toFixed(1)}%</div>
+                <p className="text-xs text-muted-foreground">Successful executions</p>
+              </CardContent>
+            </Card>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
+          >
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Avg Task Duration</CardTitle>
+                <Clock className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{stats.avgTaskDuration.toFixed(1)}s</div>
+                <p className="text-xs text-muted-foreground">Average execution time</p>
+              </CardContent>
+            </Card>
+          </motion.div>
+        </div>
+
+        {/* Recent Runs Table */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5 }}
+        >
+          <Card>
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <CardTitle>Recent Runs</CardTitle>
+                <Button variant="outline" size="sm" onClick={loadDashboardData}>
+                  <RefreshCw className="mr-2 h-4 w-4" />
+                  Refresh
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent>
+              {/* Filters */}
+              <div className="flex flex-col sm:flex-row gap-4 mb-6">
+                <div className="flex-1">
+                  <Input
+                    placeholder="Search by Run ID..."
+                    value={filters.search}
+                    onChange={(e) => setFilters(prev => ({ ...prev, search: e.target.value }))}
+                    className="max-w-sm"
+                  />
+                </div>
+                <Select value={filters.workflow} onValueChange={(value) => setFilters(prev => ({ ...prev, workflow: value }))}>
+                  <SelectTrigger className="w-[180px]">
+                    <SelectValue placeholder="All Workflows" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="">All Workflows</SelectItem>
+                    {workflows.map(workflow => (
+                      <SelectItem key={workflow.id} value={workflow.name}>
+                        {workflow.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Select value={filters.status} onValueChange={(value) => setFilters(prev => ({ ...prev, status: value }))}>
+                  <SelectTrigger className="w-[180px]">
+                    <SelectValue placeholder="All Status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="">All Status</SelectItem>
+                    <SelectItem value="SUCCESS">Success</SelectItem>
+                    <SelectItem value="RUNNING">Running</SelectItem>
+                    <SelectItem value="FAILED">Failed</SelectItem>
+                    <SelectItem value="PENDING">Pending</SelectItem>
+                    <SelectItem value="CANCELED">Canceled</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Table */}
+              <div className="rounded-md border">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Workflow Name</TableHead>
+                      <TableHead>Run ID</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead>Started At</TableHead>
+                      <TableHead>Duration</TableHead>
+                      <TableHead>Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {loading ? (
+                      <TableRow>
+                        <TableCell colSpan={6} className="text-center py-8">
+                          Loading...
+                        </TableCell>
+                      </TableRow>
+                    ) : filteredRuns.length === 0 ? (
+                      <TableRow>
+                        <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                          No runs found
+                        </TableCell>
+                      </TableRow>
+                    ) : (
+                      filteredRuns.map((run) => (
+                        <TableRow key={run.id}>
+                          <TableCell className="font-medium">
+                            {run.workflow?.name || 'Unknown'}
+                          </TableCell>
+                          <TableCell className="font-mono text-sm">
+                            {run.id.slice(0, 8)}...
+                          </TableCell>
+                          <TableCell>
+                            {getStatusBadge(run.status)}
+                          </TableCell>
+                          <TableCell>
+                            {new Date(run.startedAt).toLocaleString()}
+                          </TableCell>
+                          <TableCell>
+                            {formatDuration(run.startedAt, run.completedAt)}
+                          </TableCell>
+                          <TableCell>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => router.push(`/runs/${run.id}`)}
+                            >
+                              <Eye className="h-4 w-4" />
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      ))
+                    )}
+                  </TableBody>
+                </Table>
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+      </div>
+    </div>
+  );
+}
