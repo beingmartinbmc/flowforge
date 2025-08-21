@@ -34,7 +34,7 @@ jobs:
       run: npm run build
       env:
         NODE_ENV: production
-        NEXT_PUBLIC_API_URL: https://flowforge-backend-51ca59bfd-beingmartinbmcs-projects.vercel.app/api
+        NEXT_PUBLIC_API_URL: ${{ vars.NEXT_PUBLIC_API_URL }}
         
     - name: Copy .nojekyll file
       run: cp .github/nojekyll out/.nojekyll
