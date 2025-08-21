@@ -15,12 +15,16 @@ import {
   RefreshCw,
   AlertTriangle,
   LogOut,
-  User
+  User,
+  Trash2,
+  CheckSquare,
+  Square
 } from 'lucide-react';
 import { apiClient } from '@/lib/api';
 import { Run, WorkflowDefinition } from '@/types';
 import { useAuth } from '@/contexts/AuthContext';
 import ProtectedRoute from '@/components/ProtectedRoute';
+import { toast } from 'react-hot-toast';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -54,6 +58,8 @@ export default function Dashboard() {
     status: '',
     search: '',
   });
+  const [selectedWorkflows, setSelectedWorkflows] = useState<string[]>([]);
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     loadDashboardData();
@@ -120,6 +126,43 @@ export default function Dashboard() {
     if (seconds < 60) return `${seconds}s`;
     const minutes = Math.floor(seconds / 60);
     return `${minutes}m ${seconds % 60}s`;
+  };
+
+  const handleWorkflowSelection = (workflowId: string) => {
+    setSelectedWorkflows(prev => 
+      prev.includes(workflowId) 
+        ? prev.filter(id => id !== workflowId)
+        : [...prev, workflowId]
+    );
+  };
+
+  const handleSelectAll = () => {
+    if (selectedWorkflows.length === workflows.length) {
+      setSelectedWorkflows([]);
+    } else {
+      setSelectedWorkflows(workflows.map(w => w.id));
+    }
+  };
+
+  const handleBulkDelete = async () => {
+    if (selectedWorkflows.length === 0) return;
+    
+    if (!confirm(`Are you sure you want to delete ${selectedWorkflows.length} workflow(s)? This action cannot be undone.`)) {
+      return;
+    }
+
+    try {
+      setDeleting(true);
+      await apiClient.deleteWorkflows(selectedWorkflows);
+      toast.success(`Successfully deleted ${selectedWorkflows.length} workflow(s)`);
+      setSelectedWorkflows([]);
+      loadDashboardData(); // Refresh the data
+    } catch (error) {
+      console.error('Failed to delete workflows:', error);
+      toast.error('Failed to delete workflows');
+    } finally {
+      setDeleting(false);
+    }
   };
 
   const filteredRuns = (runs || []).filter(run => {
@@ -250,6 +293,91 @@ export default function Dashboard() {
             </Card>
           </motion.div>
         </div>
+
+        {/* Workflows Management */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+        >
+          <Card>
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <CardTitle>Workflows</CardTitle>
+                <div className="flex items-center space-x-2">
+                  {selectedWorkflows.length > 0 && (
+                    <Button 
+                      variant="destructive" 
+                      size="sm" 
+                      onClick={handleBulkDelete}
+                      disabled={deleting}
+                    >
+                      <Trash2 className="mr-2 h-4 w-4" />
+                      {deleting ? 'Deleting...' : `Delete ${selectedWorkflows.length}`}
+                    </Button>
+                  )}
+                  <Button variant="outline" size="sm" onClick={() => router.push('/workflow/new')}>
+                    <Plus className="mr-2 h-4 w-4" />
+                    Create Workflow
+                  </Button>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {workflows.length > 0 ? (
+                  <div className="space-y-2">
+                    {workflows.map((workflow) => (
+                      <div 
+                        key={workflow.id} 
+                        className="flex items-center justify-between p-3 border rounded-lg hover:bg-muted/50 transition-colors"
+                      >
+                        <div className="flex items-center space-x-3">
+                          <button
+                            onClick={() => handleWorkflowSelection(workflow.id)}
+                            className="text-muted-foreground hover:text-foreground"
+                          >
+                            {selectedWorkflows.includes(workflow.id) ? (
+                              <CheckSquare className="h-4 w-4" />
+                            ) : (
+                              <Square className="h-4 w-4" />
+                            )}
+                          </button>
+                          <div>
+                            <div className="font-medium">{workflow.name}</div>
+                            <div className="text-sm text-muted-foreground">
+                              Version {workflow.version} • {workflow.nodes.length} nodes
+                            </div>
+                          </div>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => router.push(`/workflow/${workflow.id}`)}
+                          >
+                            <Eye className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => router.push(`/workflow/new?id=${workflow.id}`)}
+                          >
+                            <Play className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-8 text-muted-foreground">
+                    No workflows found. Create your first workflow to get started.
+                  </div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
 
         {/* Recent Runs Table */}
         <motion.div
