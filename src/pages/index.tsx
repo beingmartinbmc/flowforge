@@ -113,8 +113,8 @@ export default function Dashboard() {
   };
 
   const filteredRuns = runs.filter(run => {
-    if (filters.workflow && run.workflow?.name !== filters.workflow) return false;
-    if (filters.status && run.status !== filters.status) return false;
+    if (filters.workflow && filters.workflow !== 'all' && run.workflow?.name !== filters.workflow) return false;
+    if (filters.status && filters.status !== 'all' && run.status !== filters.status) return false;
     if (filters.search && !run.id.toLowerCase().includes(filters.search.toLowerCase())) return false;
     return true;
   });
@@ -273,7 +273,7 @@ export default function Dashboard() {
                     <SelectValue placeholder="All Workflows" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">All Workflows</SelectItem>
+                    <SelectItem value="all">All Workflows</SelectItem>
                     {workflows.map(workflow => (
                       <SelectItem key={workflow.id} value={workflow.name}>
                         {workflow.name}
@@ -286,7 +286,7 @@ export default function Dashboard() {
                     <SelectValue placeholder="All Status" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">All Status</SelectItem>
+                    <SelectItem value="all">All Status</SelectItem>
                     <SelectItem value="SUCCESS">Success</SelectItem>
                     <SelectItem value="RUNNING">Running</SelectItem>
                     <SelectItem value="FAILED">Failed</SelectItem>

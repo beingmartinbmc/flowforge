@@ -168,8 +168,8 @@ export default function DeadLetterQueue() {
   };
 
   const filteredTasks = tasks.filter(task => {
-    if (filters.workflow && task.workflowName !== filters.workflow) return false;
-    if (filters.taskType && task.nodeType !== filters.taskType) return false;
+    if (filters.workflow && filters.workflow !== 'all' && task.workflowName !== filters.workflow) return false;
+    if (filters.taskType && filters.taskType !== 'all' && task.nodeType !== filters.taskType) return false;
     if (filters.search && !task.error.toLowerCase().includes(filters.search.toLowerCase())) return false;
     return true;
   });
@@ -296,7 +296,7 @@ export default function DeadLetterQueue() {
                     <SelectValue placeholder="All Workflows" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">All Workflows</SelectItem>
+                    <SelectItem value="all">All Workflows</SelectItem>
                     {uniqueWorkflows.map(workflow => (
                       <SelectItem key={workflow} value={workflow}>
                         {workflow}
@@ -309,7 +309,7 @@ export default function DeadLetterQueue() {
                     <SelectValue placeholder="All Task Types" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">All Task Types</SelectItem>
+                    <SelectItem value="all">All Task Types</SelectItem>
                     {uniqueTaskTypes.map(type => (
                       <SelectItem key={type} value={type}>
                         {type}

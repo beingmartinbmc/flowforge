@@ -55,15 +55,15 @@ class ApiClient {
 
   // Workflows
   async getWorkflows(page: number = 1, limit: number = 10): Promise<PaginatedResponse<WorkflowDefinition>> {
-    const response: AxiosResponse<ApiResponse<PaginatedResponse<WorkflowDefinition>>> = await this.client.get('/workflows', {
+    const response: AxiosResponse<PaginatedResponse<WorkflowDefinition>> = await this.client.get('/workflows', {
       params: { page, limit },
     });
-    return response.data.data!;
+    return response.data;
   }
 
   async getWorkflow(id: string): Promise<WorkflowDefinition> {
-    const response: AxiosResponse<ApiResponse<WorkflowDefinition>> = await this.client.get(`/workflows/${id}`);
-    return response.data.data!;
+    const response: AxiosResponse<WorkflowDefinition> = await this.client.get(`/workflows/${id}`);
+    return response.data;
   }
 
   async createWorkflow(data: {
@@ -72,13 +72,13 @@ class ApiClient {
     nodes: any[];
     edges: any[];
   }): Promise<WorkflowDefinition> {
-    const response: AxiosResponse<ApiResponse<WorkflowDefinition>> = await this.client.post('/workflows', data);
-    return response.data.data!;
+    const response: AxiosResponse<WorkflowDefinition> = await this.client.post('/workflows', data);
+    return response.data;
   }
 
   async updateWorkflow(id: string, data: Partial<WorkflowDefinition>): Promise<WorkflowDefinition> {
-    const response: AxiosResponse<ApiResponse<WorkflowDefinition>> = await this.client.put(`/workflows/${id}`, data);
-    return response.data.data!;
+    const response: AxiosResponse<WorkflowDefinition> = await this.client.put(`/workflows/${id}`, data);
+    return response.data;
   }
 
   async deleteWorkflow(id: string): Promise<void> {
@@ -90,18 +90,18 @@ class ApiClient {
     const params: any = { page, limit };
     if (workflowId) params.workflowId = workflowId;
     
-    const response: AxiosResponse<ApiResponse<PaginatedResponse<Run>>> = await this.client.get('/runs', { params });
-    return response.data.data!;
+    const response: AxiosResponse<PaginatedResponse<Run>> = await this.client.get('/runs', { params });
+    return response.data;
   }
 
   async getRun(id: string): Promise<Run> {
-    const response: AxiosResponse<ApiResponse<Run>> = await this.client.get(`/runs/${id}`);
-    return response.data.data!;
+    const response: AxiosResponse<Run> = await this.client.get(`/runs/${id}`);
+    return response.data;
   }
 
   async triggerRun(workflowId: string, input: Record<string, any>): Promise<Run> {
-    const response: AxiosResponse<ApiResponse<Run>> = await this.client.post(`/workflows/${workflowId}/runs`, { input });
-    return response.data.data!;
+    const response: AxiosResponse<Run> = await this.client.post(`/workflows/${workflowId}/runs`, { input });
+    return response.data;
   }
 
   async cancelRun(id: string): Promise<void> {
@@ -110,29 +110,29 @@ class ApiClient {
 
   // Tasks
   async getTasks(runId: string): Promise<Task[]> {
-    const response: AxiosResponse<ApiResponse<Task[]>> = await this.client.get(`/runs/${runId}/tasks`);
-    return response.data.data!;
+    const response: AxiosResponse<Task[]> = await this.client.get(`/runs/${runId}/tasks`);
+    return response.data;
   }
 
   async getTask(id: string): Promise<Task> {
-    const response: AxiosResponse<ApiResponse<Task>> = await this.client.get(`/tasks/${id}`);
-    return response.data.data!;
+    const response: AxiosResponse<Task> = await this.client.get(`/tasks/${id}`);
+    return response.data;
   }
 
   async retryTask(id: string): Promise<Task> {
-    const response: AxiosResponse<ApiResponse<Task>> = await this.client.post(`/tasks/${id}/retry`);
-    return response.data.data!;
+    const response: AxiosResponse<Task> = await this.client.post(`/tasks/${id}/retry`);
+    return response.data;
   }
 
   // Metrics
   async getWorkflowMetrics(workflowId: string): Promise<any> {
-    const response: AxiosResponse<ApiResponse<any>> = await this.client.get(`/workflows/${workflowId}/metrics`);
-    return response.data.data!;
+    const response: AxiosResponse<any> = await this.client.get(`/workflows/${workflowId}/metrics`);
+    return response.data;
   }
 
   async getSystemMetrics(): Promise<any> {
-    const response: AxiosResponse<ApiResponse<any>> = await this.client.get('/metrics');
-    return response.data.data!;
+    const response: AxiosResponse<any> = await this.client.get('/metrics');
+    return response.data;
   }
 }
 
