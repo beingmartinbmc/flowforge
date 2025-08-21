@@ -1,0 +1,2 @@
+# This file tells GitHub Pages not to use Jekyll processing
+# Since we're deploying a Next.js static export, we don't need Jekyll
