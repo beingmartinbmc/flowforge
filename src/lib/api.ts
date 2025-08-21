@@ -35,7 +35,11 @@ class ApiClient {
       (error) => {
         if (error.response?.status === 401) {
           localStorage.removeItem('auth_token');
-          window.location.href = '/login';
+          // Don't redirect if we're already on an auth page
+          const currentPath = window.location.pathname;
+          if (!currentPath.includes('/login') && !currentPath.includes('/register')) {
+            window.location.href = '/login';
+          }
         }
         return Promise.reject(error);
       }
