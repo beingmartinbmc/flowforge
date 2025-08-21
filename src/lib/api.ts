@@ -66,8 +66,8 @@ class ApiClient {
   }
 
   async getWorkflow(id: string): Promise<WorkflowDefinition> {
-    const response: AxiosResponse<WorkflowDefinition> = await this.client.get(`/workflows/${id}`);
-    return response.data;
+    const response: AxiosResponse<{ workflow: WorkflowDefinition }> = await this.client.get(`/workflows/${id}`);
+    return response.data.workflow;
   }
 
   async createWorkflow(data: {
@@ -76,13 +76,13 @@ class ApiClient {
     nodes: any[];
     edges: any[];
   }): Promise<WorkflowDefinition> {
-    const response: AxiosResponse<WorkflowDefinition> = await this.client.post('/workflows', data);
-    return response.data;
+    const response: AxiosResponse<{ workflow: WorkflowDefinition }> = await this.client.post('/workflows', data);
+    return response.data.workflow;
   }
 
   async updateWorkflow(id: string, data: Partial<WorkflowDefinition>): Promise<WorkflowDefinition> {
-    const response: AxiosResponse<WorkflowDefinition> = await this.client.put(`/workflows/${id}`, data);
-    return response.data;
+    const response: AxiosResponse<{ workflow: WorkflowDefinition }> = await this.client.put(`/workflows/${id}`, data);
+    return response.data.workflow;
   }
 
   async deleteWorkflow(id: string): Promise<void> {
@@ -103,13 +103,13 @@ class ApiClient {
   }
 
   async getRun(id: string): Promise<Run> {
-    const response: AxiosResponse<Run> = await this.client.get(`/runs/${id}`);
-    return response.data;
+    const response: AxiosResponse<{ run: Run }> = await this.client.get(`/runs/${id}`);
+    return response.data.run;
   }
 
   async triggerRun(workflowId: string, input: Record<string, any>): Promise<Run> {
-    const response: AxiosResponse<Run> = await this.client.post(`/workflows/${workflowId}/runs`, { input });
-    return response.data;
+    const response: AxiosResponse<{ run: Run }> = await this.client.post(`/workflows/${workflowId}/runs`, { input });
+    return response.data.run;
   }
 
   async cancelRun(id: string): Promise<void> {
@@ -118,18 +118,18 @@ class ApiClient {
 
   // Tasks
   async getTasks(runId: string): Promise<Task[]> {
-    const response: AxiosResponse<Task[]> = await this.client.get(`/runs/${runId}/tasks`);
-    return response.data;
+    const response: AxiosResponse<{ tasks: Task[] }> = await this.client.get(`/runs/${runId}/tasks`);
+    return response.data.tasks;
   }
 
   async getTask(id: string): Promise<Task> {
-    const response: AxiosResponse<Task> = await this.client.get(`/tasks/${id}`);
-    return response.data;
+    const response: AxiosResponse<{ task: Task }> = await this.client.get(`/tasks/${id}`);
+    return response.data.task;
   }
 
   async retryTask(id: string): Promise<Task> {
-    const response: AxiosResponse<Task> = await this.client.post(`/tasks/${id}/retry`);
-    return response.data;
+    const response: AxiosResponse<{ task: Task }> = await this.client.post(`/tasks/${id}/retry`);
+    return response.data.task;
   }
 
   // Metrics
