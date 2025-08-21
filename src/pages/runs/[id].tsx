@@ -38,6 +38,39 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { toast } from 'react-hot-toast';
 
+// Custom styles for ReactFlow theme integration
+const reactFlowStyles = `
+  .react-flow__node {
+    background: var(--card);
+    border: 1px solid var(--border);
+    color: var(--foreground);
+  }
+  
+  .react-flow__controls {
+    background: var(--card) !important;
+    border: 1px solid var(--border) !important;
+  }
+  
+  .react-flow__controls button {
+    background: var(--card) !important;
+    border: 1px solid var(--border) !important;
+    color: var(--foreground) !important;
+  }
+  
+  .react-flow__controls button:hover {
+    background: var(--accent) !important;
+  }
+  
+  .react-flow__minimap {
+    background: var(--card) !important;
+    border: 1px solid var(--border) !important;
+  }
+  
+  .react-flow__background {
+    background: var(--background) !important;
+  }
+`;
+
 // Custom node types for live status
 const nodeTypes: NodeTypes = {
   task: TaskNode,
@@ -306,6 +339,7 @@ function RunDetail() {
 
   return (
     <ProtectedRoute>
+      <style dangerouslySetInnerHTML={{ __html: reactFlowStyles }} />
       <div className="min-h-screen bg-background">
       {/* Header */}
       <header className="border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -322,7 +356,7 @@ function RunDetail() {
             <div>
               <h1 className="text-2xl font-bold">Run Details</h1>
               <p className="text-sm text-muted-foreground">
-                {run.id.slice(0, 8)}... • {run.workflow?.name}
+                {run.id} • {run.workflow?.name}
               </p>
             </div>
           </div>
@@ -388,7 +422,7 @@ function RunDetail() {
             <CardTitle>Workflow Execution</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="h-96">
+            <div className="h-96 bg-card border rounded-md">
               <ReactFlow
                 nodes={nodes}
                 edges={edges}
@@ -397,10 +431,19 @@ function RunDetail() {
                 nodeTypes={nodeTypes}
                 fitView
                 attributionPosition="bottom-left"
+                className="bg-card"
+                style={{ background: 'var(--background)' }}
               >
-                <Controls />
-                <Background />
-                <MiniMap />
+                <Controls className="bg-card border border-border" />
+                <Background 
+                  color="var(--muted-foreground)" 
+                  gap={20} 
+                  size={1}
+                />
+                <MiniMap 
+                  className="bg-card border border-border"
+                  style={{ background: 'var(--background)' }}
+                />
               </ReactFlow>
             </div>
           </CardContent>
