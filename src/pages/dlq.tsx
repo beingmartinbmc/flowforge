@@ -167,15 +167,15 @@ export default function DeadLetterQueue() {
     }
   };
 
-  const filteredTasks = tasks.filter(task => {
+  const filteredTasks = (tasks || []).filter(task => {
     if (filters.workflow && filters.workflow !== 'all' && task.workflowName !== filters.workflow) return false;
     if (filters.taskType && filters.taskType !== 'all' && task.nodeType !== filters.taskType) return false;
     if (filters.search && !task.error.toLowerCase().includes(filters.search.toLowerCase())) return false;
     return true;
   });
 
-  const uniqueWorkflows = Array.from(new Set(tasks.map(task => task.workflowName).filter(Boolean)));
-  const uniqueTaskTypes = Array.from(new Set(tasks.map(task => task.nodeType).filter(Boolean)));
+  const uniqueWorkflows = Array.from(new Set((tasks || []).map(task => task.workflowName).filter(Boolean)));
+  const uniqueTaskTypes = Array.from(new Set((tasks || []).map(task => task.nodeType).filter(Boolean)));
 
   return (
     <ProtectedRoute>

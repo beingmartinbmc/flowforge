@@ -68,18 +68,28 @@ export default function Dashboard() {
         apiClient.getSystemMetrics(),
       ]);
 
-      setRuns(runsData.data);
-      setWorkflows(workflowsData.data);
+      // Add null checks and provide defaults
+      setRuns(runsData?.data || []);
+      setWorkflows(workflowsData?.data || []);
       
-      // Calculate stats from metrics
+      // Calculate stats from metrics with safe defaults
       setStats({
-        totalWorkflows: workflowsData.data.length,
-        totalRuns: systemMetrics.totalRuns || 0,
-        successRate: systemMetrics.successRate || 0,
-        avgTaskDuration: systemMetrics.avgTaskDuration || 0,
+        totalWorkflows: workflowsData?.data?.length || 0,
+        totalRuns: systemMetrics?.totalRuns || 0,
+        successRate: systemMetrics?.successRate || 0,
+        avgTaskDuration: systemMetrics?.avgTaskDuration || 0,
       });
     } catch (error) {
       console.error('Failed to load dashboard data:', error);
+      // Set empty defaults on error
+      setRuns([]);
+      setWorkflows([]);
+      setStats({
+        totalWorkflows: 0,
+        totalRuns: 0,
+        successRate: 0,
+        avgTaskDuration: 0,
+      });
     } finally {
       setLoading(false);
     }
@@ -112,7 +122,7 @@ export default function Dashboard() {
     return `${minutes}m ${seconds % 60}s`;
   };
 
-  const filteredRuns = runs.filter(run => {
+  const filteredRuns = (runs || []).filter(run => {
     if (filters.workflow && filters.workflow !== 'all' && run.workflow?.name !== filters.workflow) return false;
     if (filters.status && filters.status !== 'all' && run.status !== filters.status) return false;
     if (filters.search && !run.id.toLowerCase().includes(filters.search.toLowerCase())) return false;
