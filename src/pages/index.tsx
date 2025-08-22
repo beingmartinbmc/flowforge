@@ -169,6 +169,17 @@ export default function Dashboard() {
     }
   };
 
+  const handleTriggerWorkflow = async (workflowId: string) => {
+    try {
+      await apiClient.triggerRun(workflowId, {});
+      toast.success('Workflow triggered successfully!');
+      loadDashboardData(); // Refresh to show the new run
+    } catch (error) {
+      console.error('Failed to trigger workflow:', error);
+      toast.error('Failed to trigger workflow');
+    }
+  };
+
   const filteredRuns = (runs || []).filter(run => {
     if (filters.workflow && filters.workflow !== 'all' && run.workflow?.name !== filters.workflow) return false;
     if (filters.status && filters.status !== 'all' && run.status !== filters.status) return false;
@@ -500,9 +511,16 @@ export default function Dashboard() {
                               <Button
                                 variant="ghost"
                                 size="sm"
-                                onClick={() => router.push(`/workflow/new?id=${workflow.id}`)}
+                                onClick={() => handleTriggerWorkflow(workflow.id)}
                               >
                                 <Play className="h-4 w-4" />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => router.push(`/workflow/new?id=${workflow.id}`)}
+                              >
+                                <Settings className="h-4 w-4" />
                               </Button>
                             </div>
                           </div>
