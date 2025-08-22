@@ -96,7 +96,11 @@ class ApiClient {
   }
 
   async deleteWorkflows(workflowIds: string[]): Promise<void> {
-    await this.client.post('/workflows/bulk-delete', { workflowIds });
+    await this.client.post('/workflows/bulk-delete', { 
+      workflowIds,
+      force: true,
+      deleteRuns: true
+    });
   }
 
   // Runs
