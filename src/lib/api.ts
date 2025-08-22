@@ -6,7 +6,9 @@ import type {
   Task, 
   LoginRequest, 
   LoginResponse,
-  PaginatedResponse 
+  PaginatedResponse,
+  SchedulerResponse,
+  SchedulerConfig
 } from '@/types';
 
 class ApiClient {
@@ -138,6 +140,27 @@ class ApiClient {
   async retryTask(id: string): Promise<Task> {
     const response: AxiosResponse<{ task: Task }> = await this.client.post(`/tasks/${id}/retry`);
     return response.data.task;
+  }
+
+  // Scheduler
+  async triggerScheduler(config?: SchedulerConfig): Promise<SchedulerResponse> {
+    const response: AxiosResponse<SchedulerResponse> = await this.client.post('/scheduler/process', config || {});
+    return response.data;
+  }
+
+  async triggerRedisScheduler(config?: SchedulerConfig): Promise<SchedulerResponse> {
+    const response: AxiosResponse<SchedulerResponse> = await this.client.post('/scheduler/trigger', config || {});
+    return response.data;
+  }
+
+  async triggerMongoScheduler(config?: SchedulerConfig): Promise<SchedulerResponse> {
+    const response: AxiosResponse<SchedulerResponse> = await this.client.post('/scheduler/mongo-trigger', config || {});
+    return response.data;
+  }
+
+  async triggerCronScheduler(): Promise<SchedulerResponse> {
+    const response: AxiosResponse<SchedulerResponse> = await this.client.post('/cron/process-tasks');
+    return response.data;
   }
 
   // Metrics

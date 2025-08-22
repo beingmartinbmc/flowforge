@@ -1,166 +1,202 @@
 # FlowForge - Distributed Workflow Orchestrator
 
-A modern, visual workflow management system with real-time execution monitoring and comprehensive task management.
+A modern, serverless-compatible workflow orchestration platform built with Next.js, TypeScript, and React Flow.
 
 ## 🚀 Features
 
-### 📊 Dashboard
-- **Real-time Statistics**: Total workflows, runs, success rate, and average task duration
-- **Recent Runs Table**: Filterable table with workflow name, run ID, status, timing, and actions
-- **Live Updates**: Auto-refresh functionality for real-time data
-- **Dark Mode Toggle**: Beautiful dark/light theme switching
+### Core Functionality
+- **Visual Workflow Builder**: Drag-and-drop interface for creating complex workflows
+- **Multiple Node Types**: HTTP requests, Echo tasks, Custom code execution
+- **Real-time Execution**: Monitor workflow runs and task status
+- **Scheduler-based Processing**: Serverless-compatible task processing
+- **Template System**: Pre-built workflow templates for quick start
 
-### 🔧 Workflow Builder
-- **Visual DAG Editor**: Drag-and-drop workflow creation using React Flow
-- **Multiple Node Types**: HTTP requests, Echo tasks, and custom code nodes
-- **Real-time Configuration**: Inline node configuration with live preview
-- **Export/Import**: JSON-based workflow export and import functionality
-- **Version Control**: Built-in workflow versioning system
+### Scheduler System
+- **Main Scheduler**: Processes tasks from both Redis and MongoDB
+- **Redis Scheduler**: Processes tasks from Redis queue only
+- **MongoDB Scheduler**: Processes pending tasks directly from database
+- **Cron Scheduler**: External cron job support
+- **Stuck Task Recovery**: Automatically handles stuck tasks (>5 minutes)
 
-### 📈 Run Execution Monitoring
-- **Live DAG Visualization**: Real-time workflow execution with color-coded status
-- **Animated Status Updates**: Smooth transitions for task state changes
-- **Comprehensive Logs**: Real-time execution logs with timestamps
-- **Detailed Metrics**: Success rates, execution times, and retry statistics
-- **Interactive Charts**: Pie charts and metrics visualization using Recharts
+### UI Improvements
+- **Guided Workflow Creation**: Template selector with categories and difficulty levels
+- **Scheduler Controls**: Real-time scheduler management and monitoring
+- **Tabbed Dashboard**: Organized overview, scheduler, and workflows sections
+- **Modern Design**: Beautiful, responsive UI with dark/light theme support
 
-### 🚨 Dead Letter Queue (DLQ)
-- **Failed Task Management**: Centralized view of all failed tasks
-- **Smart Filtering**: Filter by workflow, task type, and error messages
-- **Retry Functionality**: One-click task retry with retry count tracking
-- **Error Classification**: Automatic error type detection and categorization
-- **Bulk Operations**: Delete and retry multiple tasks
+## 🏗️ Architecture
 
-### 🎨 Modern UI/UX
-- **Responsive Design**: Works seamlessly on desktop and mobile
-- **Smooth Animations**: Framer Motion powered transitions
-- **Accessible Components**: Built with Radix UI primitives
-- **TypeScript Support**: Full type safety throughout the application
-- **Tailwind CSS**: Utility-first styling with custom design system
+### Frontend (Next.js)
+- **React Flow**: Visual workflow builder
+- **Zustand**: State management
+- **Tailwind CSS**: Styling
+- **Framer Motion**: Animations
+- **Radix UI**: Accessible components
 
-## 🛠️ Tech Stack
-
-- **Frontend**: Next.js 14, React 18, TypeScript
-- **UI Components**: Radix UI, Tailwind CSS, Framer Motion
-- **State Management**: Zustand
-- **Charts**: Recharts
-- **Workflow Visualization**: React Flow
-- **HTTP Client**: Axios
-- **Notifications**: React Hot Toast
-- **Theme**: Next Themes
+### Backend (Vercel Functions)
+- **Scheduler-based**: No long-running processes
+- **Redis**: Task queue management
+- **MongoDB**: Data persistence
+- **Prisma**: Database ORM
 
 ## 📦 Installation
 
-1. **Clone the repository**
-   ```bash
-   git clone <repository-url>
-   cd flowforge
-   ```
+### Prerequisites
+- Node.js 18+
+- MongoDB
+- Redis (optional, for queue management)
 
-2. **Install dependencies**
-   ```bash
-   npm install
-   ```
-
-3. **Set up environment variables**
-   ```bash
-   cp .env.example .env.local
-   ```
-   
-   Add your backend API URL:
-   ```
-   NEXT_PUBLIC_API_URL=http://localhost:3001/api
-   ```
-
-4. **Start the development server**
-   ```bash
-   npm run dev
-   ```
-
-5. **Open your browser**
-   Navigate to [http://localhost:3000](http://localhost:3000)
-
-## 🏗️ Project Structure
-
-```
-src/
-├── components/
-│   ├── ui/                 # Reusable UI components
-│   ├── dashboard/          # Dashboard-specific components
-│   └── workflow/           # Workflow builder components
-├── pages/
-│   ├── index.tsx          # Dashboard page
-│   ├── workflow/new.tsx   # Workflow builder
-│   ├── runs/[id].tsx      # Run detail page
-│   └── dlq.tsx            # Dead Letter Queue
-├── lib/
-│   ├── api.ts             # API client
-│   ├── utils.ts           # Utility functions
-│   └── websocket.ts       # WebSocket connections
-├── types/
-│   └── index.ts           # TypeScript type definitions
-└── styles/
-    └── globals.css        # Global styles and CSS variables
+### Frontend Setup
+```bash
+cd flowforge
+npm install
+npm run dev
 ```
 
-## 🎯 Key Components
+### Backend Setup
+```bash
+cd ../flowforge-backend
+npm install
+npm run dev
+```
 
-### Dashboard (`/`)
-- **Stats Cards**: Overview of system metrics
-- **Recent Runs Table**: Filterable list of workflow executions
-- **Navigation**: Quick access to workflow builder and DLQ
+## 🔧 Configuration
 
-### Workflow Builder (`/workflow/new`)
-- **React Flow Canvas**: Visual workflow editor
-- **Node Palette**: Drag-and-drop task nodes
-- **Configuration Panel**: Inline node settings
-- **Save/Export**: Workflow persistence and sharing
+### Environment Variables
+```env
+# Frontend
+NEXT_PUBLIC_API_URL=http://localhost:3001/api
 
-### Run Details (`/runs/[id]`)
-- **Live DAG**: Real-time execution visualization
-- **Status Tracking**: Color-coded task states
-- **Logs Tab**: Streaming execution logs
-- **Metrics Tab**: Performance analytics
-- **Tasks Tab**: Detailed task information
+# Backend
+DATABASE_URL=mongodb://localhost:27017/flowforge
+REDIS_URL=redis://localhost:6379
+JWT_SECRET=your-jwt-secret
+```
 
-### Dead Letter Queue (`/dlq`)
-- **Failed Tasks**: Comprehensive error management
-- **Retry Logic**: Smart retry with limits
-- **Error Analysis**: Automatic error categorization
-- **Bulk Operations**: Efficient task management
+## 🎯 Usage
 
-## 🔌 API Integration
+### Creating Workflows
 
-The frontend integrates with your backend API through the `apiClient` in `src/lib/api.ts`. Key endpoints:
+1. **Template Selection**: Choose from pre-built templates or start from scratch
+2. **Visual Builder**: Drag and drop nodes to create your workflow
+3. **Node Configuration**: Configure each node's parameters
+4. **Save & Execute**: Save your workflow and trigger execution
 
-- `GET /api/workflows` - List workflows
-- `POST /api/workflows` - Create workflow
-- `GET /api/runs` - List runs
-- `GET /api/runs/:id` - Get run details
-- `GET /api/runs/:id/tasks` - Get run tasks
-- `POST /api/tasks/:id/retry` - Retry failed task
+### Scheduler Management
 
-## 🎨 Design System
+1. **Access Scheduler Tab**: Navigate to the Scheduler tab in the dashboard
+2. **Configure Parameters**: Set max tasks, retry queue, and run ID
+3. **Trigger Processing**: Use different scheduler types as needed
+4. **Monitor Results**: View processing history and task results
 
-The application uses a comprehensive design system with:
+### Available Templates
 
-- **CSS Variables**: Theme-aware color system
-- **Component Variants**: Consistent button, card, and form styles
-- **Responsive Breakpoints**: Mobile-first design approach
-- **Accessibility**: ARIA labels and keyboard navigation
-- **Dark Mode**: Automatic theme switching
+- **Simple Echo**: Basic logging workflow
+- **API Call**: HTTP request with response logging
+- **Error Handling**: Demonstrates error handling patterns
+- **Health Check**: Multi-service monitoring
+- **Data Processing**: Fetch, process, and store data
+
+## 🔄 Scheduler Types
+
+### Main Scheduler (`/api/scheduler/process`)
+- Processes tasks from both Redis and MongoDB
+- Handles stuck tasks automatically
+- Returns detailed processing results
+
+### Redis Scheduler (`/api/scheduler/trigger`)
+- Processes tasks from Redis queue only
+- Configurable max tasks and retry queue
+
+### MongoDB Scheduler (`/api/scheduler/mongo-trigger`)
+- Processes pending tasks from MongoDB
+- Optional run ID filtering
+
+### Cron Scheduler (`/api/cron/process-tasks`)
+- Designed for external cron services
+- Supports authentication headers
 
 ## 🚀 Deployment
 
-### Build for Production
+### Vercel Deployment
 ```bash
-npm run build
-npm start
+# Frontend
+vercel --prod
+
+# Backend
+cd ../flowforge-backend
+vercel --prod
 ```
 
-### Environment Variables
-- `NEXT_PUBLIC_API_URL`: Backend API endpoint
-- `NEXT_PUBLIC_WS_URL`: WebSocket endpoint (optional)
+### Cron Job Setup
+Add to `vercel.json`:
+```json
+{
+  "crons": [
+    {
+      "path": "/api/scheduler/process",
+      "schedule": "*/30 * * * *"
+    }
+  ]
+}
+```
+
+## 📊 Monitoring
+
+### Dashboard Metrics
+- Total workflows and runs
+- Success rate and average execution time
+- Real-time scheduler status
+- Processing history
+
+### Scheduler Monitoring
+- Task processing results
+- Error tracking
+- Performance metrics
+- Queue status
+
+## 🔧 Development
+
+### Project Structure
+```
+flowforge/
+├── src/
+│   ├── components/
+│   │   ├── dashboard/
+│   │   │   └── SchedulerControl.tsx
+│   │   └── workflow/
+│   │       └── TemplateSelector.tsx
+│   ├── lib/
+│   │   ├── api.ts
+│   │   └── workflow-templates.ts
+│   ├── stores/
+│   │   ├── auth-store.ts
+│   │   ├── workflow-store.ts
+│   │   └── scheduler-store.ts
+│   └── types/
+│       └── index.ts
+└── package.json
+```
+
+### Key Components
+
+#### SchedulerControl
+- Manages scheduler operations
+- Real-time monitoring
+- Configuration management
+- Result visualization
+
+#### TemplateSelector
+- Template browsing and filtering
+- Category and difficulty filtering
+- Search functionality
+- Template preview
+
+#### Workflow Templates
+- Pre-built workflow examples
+- Categorized by use case
+- Difficulty levels
+- Comprehensive documentation
 
 ## 🤝 Contributing
 
@@ -170,20 +206,41 @@ npm start
 4. Add tests if applicable
 5. Submit a pull request
 
-## 📄 License
+## 📝 License
 
-This project is licensed under the MIT License.
+MIT License - see LICENSE file for details
 
 ## 🆘 Support
 
 For support and questions:
-- Create an issue in the repository
+- Create an issue on GitHub
 - Check the documentation
-- Review the API integration guide
+- Review the scheduler README in the backend
 
----
+## 🔄 Migration from Long-running Workers
 
-**FlowForge** - Empowering developers with visual workflow orchestration 🚀
-# Updated Thu Aug 21 08:17:42 IST 2025
-# Updated Vercel URL - Thu Aug 21 08:29:07 IST 2025
-# Updated Vercel URL - Thu Aug 21 14:48:52 IST 2025
+The scheduler-based approach replaces the previous long-running worker system:
+
+### Benefits
+- ✅ Serverless compatible
+- ✅ Better resource utilization
+- ✅ Automatic scaling
+- ✅ Cost effective
+- ✅ Reliable task processing
+
+### Migration Steps
+1. Deploy new scheduler endpoints
+2. Set up cron job triggers
+3. Test workflow execution
+4. Monitor performance
+5. Remove old worker code
+
+## 🎉 What's New
+
+### v2.0.0 - Scheduler-based Architecture
+- ✨ Scheduler-based task processing
+- 🎨 Guided workflow creation with templates
+- 📊 Enhanced dashboard with scheduler controls
+- 🔧 Improved UI/UX with tabbed interface
+- 📈 Real-time monitoring and metrics
+- 🚀 Serverless deployment ready

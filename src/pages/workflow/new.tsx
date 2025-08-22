@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { motion } from 'framer-motion';
 import ReactFlow, {
@@ -24,11 +24,13 @@ import {
   Trash2,
   Copy,
   Download,
-  Upload
+  Upload,
+  Sparkles
 } from 'lucide-react';
 import { apiClient } from '@/lib/api';
-import { WorkflowDefinition, WorkflowNode, WorkflowEdge } from '@/types';
+import { WorkflowDefinition, WorkflowNode, WorkflowEdge, WorkflowTemplate } from '@/types';
 import ProtectedRoute from '@/components/ProtectedRoute';
+import TemplateSelector from '@/components/workflow/TemplateSelector';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -76,7 +78,51 @@ function WorkflowBuilder() {
   const [description, setDescription] = useState('');
   const [selectedNode, setSelectedNode] = useState<Node | null>(null);
   const [saving, setSaving] = useState(false);
+  const [showTemplateSelector, setShowTemplateSelector] = useState(true);
+  const [selectedTemplate, setSelectedTemplate] = useState<WorkflowTemplate | null>(null);
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
+
+  // Check if we're editing an existing workflow
+  useEffect(() => {
+    const workflowId = router.query.id as string;
+    if (workflowId) {
+      loadExistingWorkflow(workflowId);
+      setShowTemplateSelector(false);
+    }
+  }, [router.query.id]);
+
+  const loadExistingWorkflow = async (workflowId: string) => {
+    try {
+      const workflow = await apiClient.getWorkflow(workflowId);
+      setWorkflowName(workflow.name);
+      setDescription(workflow.description || '');
+      
+      // Convert workflow nodes to ReactFlow nodes
+      const reactFlowNodes: Node[] = workflow.nodes.map(node => ({
+        id: node.id,
+        type: node.type as any,
+        position: node.position,
+        data: {
+          label: node.name,
+          config: node.config,
+        },
+      }));
+      
+      // Convert workflow edges to ReactFlow edges
+      const reactFlowEdges: Edge[] = workflow.edges.map(edge => ({
+        id: edge.id,
+        source: edge.source,
+        target: edge.target,
+        type: edge.type,
+      }));
+      
+      setNodes(reactFlowNodes);
+      setEdges(reactFlowEdges);
+    } catch (error) {
+      console.error('Failed to load workflow:', error);
+      toast.error('Failed to load workflow');
+    }
+  };
 
   const onConnect = useCallback(
     (params: Connection) => setEdges((eds) => addEdge(params, eds)),
@@ -86,6 +132,42 @@ function WorkflowBuilder() {
   const onNodeClick = useCallback((event: any, node: Node) => {
     setSelectedNode(node);
   }, []);
+
+  const handleTemplateSelect = (template: WorkflowTemplate) => {
+    setSelectedTemplate(template);
+    setWorkflowName(template.name);
+    setDescription(template.description);
+    
+    // Convert template nodes to ReactFlow nodes
+    const reactFlowNodes: Node[] = template.nodes.map(node => ({
+      id: node.id,
+      type: node.type as any,
+      position: node.position,
+      data: {
+        label: node.name,
+        config: node.config,
+      },
+    }));
+    
+    // Convert template edges to ReactFlow edges
+    const reactFlowEdges: Edge[] = template.edges.map(edge => ({
+      id: edge.id,
+      source: edge.source,
+      target: edge.target,
+      type: edge.type,
+    }));
+    
+    setNodes(reactFlowNodes);
+    setEdges(reactFlowEdges);
+    setShowTemplateSelector(false);
+    toast.success(`Template "${template.name}" loaded successfully!`);
+  };
+
+  const handleSkipTemplate = () => {
+    setShowTemplateSelector(false);
+    setNodes(initialNodes);
+    setEdges(initialEdges);
+  };
 
   const addNode = (type: string) => {
     const getLabel = (type: string) => {
@@ -210,6 +292,39 @@ function WorkflowBuilder() {
     linkElement.click();
   };
 
+  // Show template selector if it's a new workflow
+  if (showTemplateSelector) {
+    return (
+      <ProtectedRoute>
+        <div className="min-h-screen bg-background">
+          {/* Header */}
+          <header className="border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+            <div className="container flex h-16 items-center justify-between">
+              <div className="flex items-center space-x-4">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => router.push('/')}
+                >
+                  <ArrowLeft className="mr-2 h-4 w-4" />
+                  Back to Dashboard
+                </Button>
+                <h1 className="text-2xl font-bold">Create Workflow</h1>
+              </div>
+            </div>
+          </header>
+
+          <div className="container mx-auto p-6">
+            <TemplateSelector
+              onTemplateSelect={handleTemplateSelect}
+              onSkip={handleSkipTemplate}
+            />
+          </div>
+        </div>
+      </ProtectedRoute>
+    );
+  }
+
   return (
     <ProtectedRoute>
       <div className="h-screen flex flex-col bg-background">
@@ -226,6 +341,12 @@ function WorkflowBuilder() {
               Back to Dashboard
             </Button>
             <h1 className="text-2xl font-bold">Create Workflow</h1>
+            {selectedTemplate && (
+              <Badge variant="outline" className="flex items-center space-x-1">
+                <Sparkles className="h-3 w-3" />
+                <span>Template: {selectedTemplate.name}</span>
+              </Badge>
+            )}
           </div>
           <div className="flex items-center space-x-2">
             <Button variant="outline" onClick={exportWorkflow}>

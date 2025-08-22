@@ -73,6 +73,44 @@ export interface Run {
   };
 }
 
+// Scheduler types
+export interface SchedulerResult {
+  taskId: string;
+  nodeId?: string;
+  status: 'processed' | 'error' | 'processed_stuck' | 'error_stuck';
+  source: 'redis' | 'mongodb';
+  error?: string;
+}
+
+export interface SchedulerResponse {
+  success: boolean;
+  message: string;
+  processedTasks: number;
+  redisTasksProcessed: number;
+  pendingTasksFound: number;
+  stuckTasksFound: number;
+  results: SchedulerResult[];
+  timestamp: string;
+}
+
+export interface SchedulerConfig {
+  maxTasks: number;
+  processRetryQueue: boolean;
+  runId?: string;
+}
+
+// Workflow templates for guided creation
+export interface WorkflowTemplate {
+  id: string;
+  name: string;
+  description: string;
+  category: 'basic' | 'api' | 'automation' | 'monitoring';
+  difficulty: 'beginner' | 'intermediate' | 'advanced';
+  nodes: WorkflowNode[];
+  edges: WorkflowEdge[];
+  tags: string[];
+}
+
 // API types
 export interface ApiResponse<T = any> {
   success: boolean;
