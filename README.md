@@ -2,6 +2,8 @@
 
 A modern, serverless-compatible workflow orchestration platform built with Next.js, TypeScript, and React Flow.
 
+> **Latest Update**: Fixed HTTP task configuration issue - tasks now properly receive node configuration instead of task input.
+
 ## 🚀 Features
 
 ### Core Functionality
