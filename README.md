@@ -2,7 +2,7 @@
 
 A modern, serverless-compatible workflow orchestration platform built with Next.js, TypeScript, and React Flow.
 
-> **Latest Update**: UI Log Capture - API response data now visible in frontend UI logs, not just backend console.
+> **Latest Update**: Direct API Response Logging - HTTP tasks now log response data directly in execution logs, no separate Log Response node needed.
 
 ## 🚀 Features
 
