@@ -11,7 +11,12 @@
     "lint": "next lint",
     "type-check": "tsc --noEmit",
     "export": "next build",
-    "deploy": "npm run build && touch out/.nojekyll && git add -f out/ && git commit -m \"Deploy to GitHub Pages\" && git subtree push --prefix out origin gh-pages"
+    "deploy": "npm run build && touch out/.nojekyll && git add -f out/ && git commit -m \"Deploy to GitHub Pages\" && git subtree push --prefix out origin gh-pages",
+    "monitor:check": "node scripts/monitor-env.js check",
+    "monitor:watch": "node scripts/monitor-env.js watch",
+    "monitor:trigger": "node scripts/monitor-env.js trigger",
+    "deploy:auto": "npm run monitor:check && npm run deploy",
+    "deploy:force": "git add . && git commit -m \"auto: trigger deployment\" && git push origin main"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.1.15",

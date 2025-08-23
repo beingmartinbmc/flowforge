@@ -1,0 +1,111 @@
+name: Auto Deploy on Environment Changes
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.env*'
+      - 'src/lib/api.ts'
+      - 'package.json'
+      - 'next.config.js'
+  workflow_dispatch:
+    inputs:
+      force_deploy:
+        description: 'Force deployment even without changes'
+        required: false
+        default: 'false'
+
+jobs:
+  check-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      should-deploy: ${{ steps.check.outputs.should-deploy }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+      
+      - name: Check for relevant changes
+        id: check
+        run: |
+          # Check if this is a forced deployment
+          if [[ "${{ github.event.inputs.force_deploy }}" == "true" ]]; then
+            echo "should-deploy=true" >> $GITHUB_OUTPUT
+            echo "Forced deployment requested"
+            exit 0
+          fi
+          
+          # Check for environment-related changes
+          if git diff --name-only HEAD~1 | grep -E '\.(env|config\.js|api\.ts)$' || git diff --name-only HEAD~1 | grep -E 'package\.json'; then
+            echo "should-deploy=true" >> $GITHUB_OUTPUT
+            echo "Environment or config changes detected"
+          else
+            echo "should-deploy=false" >> $GITHUB_OUTPUT
+            echo "No environment changes detected"
+          fi
+
+  deploy:
+    needs: check-changes
+    if: needs.check-changes.outputs.should-deploy == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Build application
+        run: npm run build
+        env:
+          NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL }}
+      
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./out
+          force_orphan: true
+      
+      - name: Notify deployment
+        run: |
+          echo "🚀 Deployment completed successfully!"
+          echo "📱 Frontend URL: https://${{ github.repository_owner }}.github.io"
+          echo "🔧 Backend URL: ${{ secrets.NEXT_PUBLIC_API_URL }}"
+
+  manual-deploy:
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Build application
+        run: npm run build
+        env:
+          NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL }}
+      
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./out
+          force_orphan: true
+      
+      - name: Notify deployment
+        run: |
+          echo "🚀 Manual deployment completed successfully!"
+          echo "📱 Frontend URL: https://${{ github.repository_owner }}.github.io"
