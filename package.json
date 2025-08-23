@@ -16,7 +16,8 @@
     "monitor:watch": "node scripts/monitor-env.js watch",
     "monitor:trigger": "node scripts/monitor-env.js trigger",
     "deploy:auto": "npm run monitor:check && npm run deploy",
-    "deploy:force": "git add . && git commit -m \"auto: trigger deployment\" && git push origin main"
+    "deploy:force": "git add . && git commit -m \"auto: trigger deployment\" && git push origin main",
+    "favicon:generate": "node scripts/generate-favicons.js"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.1.15",
