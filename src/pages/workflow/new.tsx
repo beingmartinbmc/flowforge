@@ -461,7 +461,7 @@ function WorkflowBuilder() {
         </div>
 
         {/* Main Flow Area */}
-        <div className="flex-1" ref={reactFlowWrapper}>
+        <div className="flex-1 h-full" ref={reactFlowWrapper}>
           <ReactFlow
             nodes={nodes}
             edges={edges}
@@ -472,9 +472,15 @@ function WorkflowBuilder() {
             nodeTypes={nodeTypes}
             fitView
             attributionPosition="bottom-left"
+            style={{ width: '100%', height: '100%' }}
           >
             <Controls />
-            <Background />
+            <Background 
+              gap={20} 
+              size={1}
+              color="hsl(var(--muted-foreground))"
+              className="opacity-30"
+            />
             <MiniMap />
           </ReactFlow>
         </div>

@@ -59,6 +59,14 @@
 }
 
 /* React Flow custom styles */
+.react-flow {
+  background-color: hsl(var(--background));
+}
+
+.react-flow__pane {
+  background-color: hsl(var(--background));
+}
+
 .react-flow__node {
   @apply border-2 border-border bg-card text-card-foreground shadow-sm;
 }
@@ -81,6 +89,18 @@
 
 .react-flow__edge.selected .react-flow__edge-path {
   @apply stroke-primary;
+}
+
+.react-flow__controls {
+  @apply bg-card border border-border shadow-sm;
+}
+
+.react-flow__controls button {
+  @apply bg-card text-card-foreground border border-border hover:bg-accent;
+}
+
+.react-flow__minimap {
+  @apply bg-card border border-border;
 }
 
 /* Custom scrollbar */
