@@ -10,6 +10,7 @@ import type {
   SchedulerResponse,
   SchedulerConfig
 } from '@/types';
+import { getPath } from '@/lib/utils';
 
 class ApiClient {
   private client: AxiosInstance;
@@ -40,7 +41,7 @@ class ApiClient {
           // Don't redirect if we're already on an auth page
           const currentPath = window.location.pathname;
           if (!currentPath.includes('/login') && !currentPath.includes('/register')) {
-            window.location.href = '/login';
+            window.location.href = getPath('/login');
           }
         }
         return Promise.reject(error);
