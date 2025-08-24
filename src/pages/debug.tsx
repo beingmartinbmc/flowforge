@@ -1,18 +1,39 @@
 import { useEffect, useState } from 'react';
 import { getPath } from '@/lib/utils';
 
+// Client-side only component for localStorage access
+function LocalStorageDebug() {
+  const [storageInfo, setStorageInfo] = useState<any>({});
+
+  useEffect(() => {
+    setStorageInfo({
+      auth_token: localStorage.getItem('auth_token') ? 'EXISTS' : 'NOT_FOUND',
+      user: localStorage.getItem('user') ? 'EXISTS' : 'NOT_FOUND',
+    });
+  }, []);
+
+  return (
+    <div className="bg-card p-6 rounded-lg border">
+      <h2 className="text-xl font-semibold mb-4">Local Storage (Client-Side)</h2>
+      <pre className="bg-muted p-4 rounded text-sm overflow-auto">
+        {JSON.stringify(storageInfo, null, 2)}
+      </pre>
+    </div>
+  );
+}
+
 export default function Debug() {
   const [debugInfo, setDebugInfo] = useState<any>({});
 
   useEffect(() => {
     setDebugInfo({
-      hostname: window.location.hostname,
-      pathname: window.location.pathname,
-      href: window.location.href,
+      hostname: typeof window !== 'undefined' ? window.location.hostname : 'server',
+      pathname: typeof window !== 'undefined' ? window.location.pathname : 'server',
+      href: typeof window !== 'undefined' ? window.location.href : 'server',
       basePath: getPath(''),
       loginPath: getPath('/login'),
-      isGitHubPages: window.location.hostname === 'beingmartinbmc.github.io',
-      userAgent: navigator.userAgent,
+      isGitHubPages: typeof window !== 'undefined' ? window.location.hostname === 'beingmartinbmc.github.io' : false,
+      userAgent: typeof window !== 'undefined' ? navigator.userAgent : 'server',
     });
   }, []);
 
@@ -47,15 +68,7 @@ export default function Debug() {
             </div>
           </div>
 
-          <div className="bg-card p-6 rounded-lg border">
-            <h2 className="text-xl font-semibold mb-4">Local Storage</h2>
-            <pre className="bg-muted p-4 rounded text-sm overflow-auto">
-              {JSON.stringify({
-                auth_token: localStorage.getItem('auth_token') ? 'EXISTS' : 'NOT_FOUND',
-                user: localStorage.getItem('user') ? 'EXISTS' : 'NOT_FOUND',
-              }, null, 2)}
-            </pre>
-          </div>
+          <LocalStorageDebug />
         </div>
       </div>
     </div>
