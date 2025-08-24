@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from 'react-hot-toast';
+import { getPath } from '@/lib/utils';
 
 export default function Login() {
   const router = useRouter();
@@ -24,7 +25,7 @@ export default function Login() {
   // Redirect if already authenticated
   useEffect(() => {
     if (isAuthenticated) {
-      router.push('/');
+      router.push(getPath('/'));
     }
   }, [isAuthenticated, router]);
 
@@ -43,12 +44,12 @@ export default function Login() {
         const response = await apiClient.login(formData);
         login(response.token, response.user);
         toast.success('Login successful!');
-        router.push('/');
+        router.push(getPath('/'));
       } else {
         const response = await apiClient.register(formData);
         login(response.token, response.user);
         toast.success('Registration successful!');
-        router.push('/');
+        router.push(getPath('/'));
       }
     } catch (error: any) {
       console.error('Authentication error:', error);

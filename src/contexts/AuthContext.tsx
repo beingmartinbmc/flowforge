@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
+import { getPath } from '@/lib/utils';
 
 interface User {
   id: string;
@@ -51,7 +52,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     localStorage.removeItem('auth_token');
     localStorage.removeItem('user');
     setUser(null);
-    router.push('/login');
+    router.push(getPath('/login'));
   };
 
   const value = {
