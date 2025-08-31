@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { getPath } from '@/lib/utils';
+import { apiClient } from '@/lib/api';
 
 interface User {
   id: string;
@@ -32,6 +33,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       try {
         const parsedUser = JSON.parse(userData);
         setUser(parsedUser);
+        
+        // Validate token by making a test API call
+        // This will trigger the 401 interceptor if token is invalid
+        apiClient.getWorkflows(1, 1).catch(() => {
+          // Token is invalid, clear auth data
+          localStorage.removeItem('auth_token');
+          localStorage.removeItem('user');
+          setUser(null);
+        });
       } catch (error) {
         console.error('Error parsing user data:', error);
         localStorage.removeItem('auth_token');

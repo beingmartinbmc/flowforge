@@ -188,56 +188,57 @@ export default function Dashboard() {
   });
 
   return (
-    <div className="min-h-screen bg-background">
-        {/* Header */}
-        <header className="border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-          <div className="container flex h-16 items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <h1 className="text-2xl font-bold">FlowForge</h1>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-              >
-                {theme === 'dark' ? '🌞' : '🌙'}
-              </Button>
-            </div>
-            <div className="flex items-center space-x-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => router.push('/dlq')}
-              >
-                <AlertTriangle className="mr-2 h-4 w-4" />
-                Dead Letter Queue
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => router.push('/workflow/new')}
-              >
-                <Plus className="mr-2 h-4 w-4" />
-                Create Workflow
-              </Button>
-            </div>
-            <div className="flex items-center space-x-2">
-              <div className="flex items-center space-x-2 text-sm text-muted-foreground">
-                <User className="h-4 w-4" />
-                <span>{user?.email}</span>
+    <ProtectedRoute>
+      <div className="min-h-screen bg-background">
+          {/* Header */}
+          <header className="border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+            <div className="container flex h-16 items-center justify-between">
+              <div className="flex items-center space-x-4">
+                <h1 className="text-2xl font-bold">FlowForge</h1>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+                >
+                  {theme === 'dark' ? '🌞' : '🌙'}
+                </Button>
               </div>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={logout}
-              >
-                <LogOut className="mr-2 h-4 w-4" />
-                Logout
-              </Button>
+              <div className="flex items-center space-x-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => router.push('/dlq')}
+                >
+                  <AlertTriangle className="mr-2 h-4 w-4" />
+                  Dead Letter Queue
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => router.push('/workflow/new')}
+                >
+                  <Plus className="mr-2 h-4 w-4" />
+                  Create Workflow
+                </Button>
+              </div>
+              <div className="flex items-center space-x-2">
+                <div className="flex items-center space-x-2 text-sm text-muted-foreground">
+                  <User className="h-4 w-4" />
+                  <span>{user?.email}</span>
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={logout}
+                >
+                  <LogOut className="mr-2 h-4 w-4" />
+                  Logout
+                </Button>
+              </div>
             </div>
-          </div>
-        </header>
+          </header>
 
-      <div className="container mx-auto p-6 space-y-6">
+        <div className="container mx-auto p-6 space-y-6">
         {/* Main Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           <TabsList className="grid w-full grid-cols-3">
@@ -537,7 +538,8 @@ export default function Dashboard() {
             </motion.div>
           </TabsContent>
         </Tabs>
+        </div>
       </div>
-    </div>
+    </ProtectedRoute>
   );
 }
