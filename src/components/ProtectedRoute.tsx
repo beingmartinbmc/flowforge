@@ -14,8 +14,16 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
   const [redirecting, setRedirecting] = useState(false);
 
   useEffect(() => {
-    // Only redirect if we're not loading, not authenticated, and not already redirecting
-    if (!loading && !isAuthenticated && !redirecting) {
+    // Don't redirect if we're still loading or if we're already redirecting
+    if (loading || redirecting) return;
+    
+    // Don't redirect if we're in the middle of SPA routing
+    if (typeof window !== 'undefined' && window.location.search.includes('?/')) {
+      return;
+    }
+    
+    // Only redirect if we're not authenticated
+    if (!isAuthenticated) {
       setRedirecting(true);
       // Add a small delay to prevent rapid redirects
       setTimeout(() => {

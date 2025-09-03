@@ -12,20 +12,29 @@ export default function App({ Component, pageProps }: AppProps) {
   useEffect(() => {
     // GitHub Pages SPA redirect logic
     if (typeof window !== 'undefined') {
-      const pathSegmentsToKeep = 1;
       const l = window.location;
       
       // Check if this is a redirect from 404.html
       if (l.search[1] === '/' ) {
-        var decoded = l.search.slice(1).split('&').map(function(s) { 
-          return s.replace(/~and~/g, '&')
-        }).join('?');
-        window.history.replaceState(null, '',
-            l.pathname.slice(0, -1) + decoded + l.hash
-        );
+        try {
+          var decoded = l.search.slice(1).split('&').map(function(s) { 
+            return s.replace(/~and~/g, '&')
+          }).join('?');
+          
+          // Clean up the path and navigate properly
+          const cleanPath = decoded.startsWith('/') ? decoded : `/${decoded}`;
+          
+          // Use router.replace to avoid adding to browser history
+          router.replace(cleanPath);
+        } catch (error) {
+          console.error('Error processing SPA redirect:', error);
+          // Fallback: redirect to home page
+          router.replace('/');
+        }
       }
     }
-  }, []);
+  }, [router]);
+  
   return (
     <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
       <AuthProvider>
