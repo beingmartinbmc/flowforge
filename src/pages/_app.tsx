@@ -29,6 +29,7 @@ export default function App({ Component, pageProps }: AppProps) {
           
           // Prevent infinite loops by checking if we're already on the right path
           if (router.pathname !== cleanPath) {
+            console.log('SPA redirect:', cleanPath);
             router.replace(cleanPath);
           }
         } catch (error) {
