@@ -58,6 +58,14 @@ export default function App({ Component, pageProps }: AppProps) {
         console.warn('Too many redirect attempts, stopping to prevent infinite loop');
         hasProcessedRedirect.current = true;
       }
+      
+      // Debug: Log the current URL state
+      console.log('Current URL state:', {
+        pathname: l.pathname,
+        search: l.search,
+        href: l.href,
+        routerPath: router.pathname
+      });
     }
   }, [router]);
   
