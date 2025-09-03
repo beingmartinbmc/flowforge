@@ -8,7 +8,6 @@ const nextConfig = {
     basePath: '/flowforge',
     assetPrefix: '/flowforge/',
     output: 'export',
-    trailingSlash: true,
     images: {
       unoptimized: true,
     },

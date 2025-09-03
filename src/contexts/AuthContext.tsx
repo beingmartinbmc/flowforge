@@ -22,6 +22,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [initialized, setInitialized] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -46,10 +47,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         console.error('Error parsing user data:', error);
         localStorage.removeItem('auth_token');
         localStorage.removeItem('user');
+        setUser(null);
       }
+    } else {
+      // No token found, ensure user is null
+      setUser(null);
     }
     
     setLoading(false);
+    setInitialized(true);
   }, []);
 
   const login = (token: string, user: User) => {
@@ -62,7 +68,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     localStorage.removeItem('auth_token');
     localStorage.removeItem('user');
     setUser(null);
-    router.push(getPath('/login'));
+    // Only redirect if we're not already on the login page
+    if (router.pathname !== '/login') {
+      router.push(getPath('/login'));
+    }
   };
 
   const value = {
@@ -70,7 +79,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     loading,
     login,
     logout,
-    isAuthenticated: !!user,
+    isAuthenticated: !!user && initialized,
   };
 
   return (
