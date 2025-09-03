@@ -23,6 +23,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [initialized, setInitialized] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -65,13 +66,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const logout = () => {
+    setIsLoggingOut(true);
     localStorage.removeItem('auth_token');
     localStorage.removeItem('user');
     setUser(null);
-    // Only redirect if we're not already on the login page
-    if (router.pathname !== '/login') {
-      router.push(getPath('/login'));
-    }
+    // Let ProtectedRoute handle the redirect - don't redirect here
+    // This prevents conflicts with ProtectedRoute redirects
   };
 
   const value = {
@@ -79,7 +79,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     loading,
     login,
     logout,
-    isAuthenticated: !!user && initialized,
+    isAuthenticated: !!user && initialized && !isLoggingOut,
   };
 
   return (
