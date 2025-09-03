@@ -16,6 +16,7 @@ export default function Login() {
   const { isAuthenticated, login } = useAuth();
   const [isLogin, setIsLogin] = useState(true);
   const [loading, setLoading] = useState(false);
+  const [redirecting, setRedirecting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     email: '',
@@ -24,10 +25,14 @@ export default function Login() {
 
   // Redirect if already authenticated
   useEffect(() => {
-    if (isAuthenticated && !loading) {
-      router.push(getPath('/'));
+    if (isAuthenticated && !loading && !redirecting) {
+      setRedirecting(true);
+      // Small delay to ensure state is stable
+      setTimeout(() => {
+        router.push(getPath('/'));
+      }, 100);
     }
-  }, [isAuthenticated, loading, router]);
+  }, [isAuthenticated, loading, router, redirecting]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -44,12 +49,12 @@ export default function Login() {
         const response = await apiClient.login(formData);
         login(response.token, response.user);
         toast.success('Login successful!');
-        router.push(getPath('/'));
+        // Redirect handled by useEffect
       } else {
         const response = await apiClient.register(formData);
         login(response.token, response.user);
         toast.success('Registration successful!');
-        router.push(getPath('/'));
+        // Redirect handled by useEffect
       }
     } catch (error: any) {
       console.error('Authentication error:', error);
