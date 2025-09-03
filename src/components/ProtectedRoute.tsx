@@ -22,6 +22,11 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
       return;
     }
     
+    // Don't redirect if we have malformed URLs (like ?/flowforge)
+    if (typeof window !== 'undefined' && window.location.search.includes('?/flowforge')) {
+      return;
+    }
+    
     // Only redirect if we're not authenticated
     if (!isAuthenticated) {
       setRedirecting(true);
