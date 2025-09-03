@@ -4,30 +4,33 @@
     <meta charset="utf-8">
     <title>FlowForge</title>
     <script type="text/javascript">
-      // Single Page Apps for GitHub Pages
-      // MIT License
-      // https://github.com/rafgraph/spa-github-pages
-      // This script takes the current url and converts the path and query
-      // string into just a query string, and then redirects the browser
-      // to the new url with only a query string and hash fragment.
-      var pathSegmentsToKeep = 1; // Keep /flowforge
-
-      var l = window.location;
-      var path = l.pathname;
-      var segments = path.split('/');
+      // Simple SPA routing for GitHub Pages
+      // This script handles routing without creating malformed URLs
       
-      // Ensure we have the correct base path
-      if (segments[1] === 'flowforge' && segments.length > 2) {
-        var newPath = '/' + segments.slice(2).join('/');
-        l.replace(
-          l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') +
-          '/flowforge/?/' + newPath.slice(1).replace(/&/g, '~and~') +
-          (l.search ? '&' + l.search.slice(1).replace(/&/g, '~and~') : '') +
-          l.hash
-        );
-      }
+      (function() {
+        var l = window.location;
+        var path = l.pathname;
+        var segments = path.split('/');
+        
+        // Check if we're on the correct base path
+        if (segments[1] === 'flowforge') {
+          // If we have additional path segments, redirect to the base with query
+          if (segments.length > 2) {
+            var additionalPath = segments.slice(2).join('/');
+            var newUrl = l.protocol + '//' + l.hostname + 
+                        (l.port ? ':' + l.port : '') + 
+                        '/flowforge/?/' + additionalPath;
+            
+            // Only redirect if we're not already there
+            if (l.href !== newUrl) {
+              l.replace(newUrl);
+            }
+          }
+        }
+      })();
     </script>
   </head>
   <body>
+    <div id="loading">Loading FlowForge...</div>
   </body>
 </html>
