@@ -5,7 +5,7 @@
     <title>FlowForge</title>
     <script type="text/javascript">
       // Fixed SPA routing for GitHub Pages
-      // Only handles valid sub-routes, prevents malformed paths
+      // Only handles actual sub-routes, excludes /flowforge/ to prevent duplicates
       
       (function() {
         var l = window.location;
@@ -14,13 +14,13 @@
         // Only process if:
         // 1. We're not already on a query-based URL
         // 2. We have a path that starts with /flowforge/
-        // 3. The path has valid sub-routes (not just /flowforge/flowforge)
-        if (l.search === '' && path.startsWith('/flowforge/')) {
+        // 3. The path is NOT just /flowforge/ (exclude to prevent duplicates)
+        if (l.search === '' && path.startsWith('/flowforge/') && path !== '/flowforge/') {
           // Extract the route part after /flowforge/
           var route = path.substring('/flowforge/'.length);
           
-          // Only redirect if we have a valid route that's not 'flowforge'
-          if (route && route.trim() !== '' && route !== 'flowforge') {
+          // Only redirect if we have a valid route
+          if (route && route.trim() !== '') {
             // Create the new URL with the route as a query parameter
             var newUrl = l.protocol + '//' + l.hostname + 
                         (l.port ? ':' + l.port : '') + 
