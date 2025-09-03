@@ -27,6 +27,11 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
       return;
     }
     
+    // Don't redirect if we're on the base URL with query parameters
+    if (typeof window !== 'undefined' && window.location.pathname === '/flowforge' && window.location.search !== '') {
+      return;
+    }
+    
     // Only redirect if we're not authenticated
     if (!isAuthenticated) {
       setRedirecting(true);

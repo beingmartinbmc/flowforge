@@ -4,20 +4,21 @@
     <meta charset="utf-8">
     <title>FlowForge</title>
     <script type="text/javascript">
-      // Simple SPA routing for GitHub Pages
-      // This script directly handles routing without complex path manipulation
+      // Bulletproof SPA routing for GitHub Pages
+      // This script handles all routing scenarios without creating malformed URLs
       
       (function() {
         var l = window.location;
         var path = l.pathname;
         
-        // Only handle paths that start with /flowforge/
-        if (path.startsWith('/flowforge/')) {
-          // Extract the part after /flowforge/
+        // Only process if we're not already on a query-based URL
+        if (l.search === '' && path.startsWith('/flowforge/')) {
+          // Extract the route part after /flowforge/
           var route = path.substring('/flowforge/'.length);
           
-          // If we have a valid route, redirect to the base with query
-          if (route && route !== '') {
+          // Only redirect if we have a valid route and it's not empty
+          if (route && route.trim() !== '') {
+            // Create the new URL with the route as a query parameter
             var newUrl = l.protocol + '//' + l.hostname + 
                         (l.port ? ':' + l.port : '') + 
                         '/flowforge/?/' + route;

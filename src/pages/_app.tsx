@@ -9,36 +9,54 @@ import '@/styles/globals.css';
 export default function App({ Component, pageProps }: AppProps) {
   const router = useRouter();
   const hasProcessedRedirect = useRef(false);
+  const redirectAttempts = useRef(0);
 
   useEffect(() => {
-    // GitHub Pages SPA redirect logic
+    // Bulletproof GitHub Pages SPA redirect logic
     if (typeof window !== 'undefined' && !hasProcessedRedirect.current) {
       const l = window.location;
       
       // Check if this is a redirect from 404.html
-      if (l.search[1] === '/' ) {
+      if (l.search[1] === '/' && redirectAttempts.current < 3) {
         try {
-          hasProcessedRedirect.current = true;
+          redirectAttempts.current += 1;
           
+          // Decode the route from the query string
           var decoded = l.search.slice(1).split('&').map(function(s) { 
             return s.replace(/~and~/g, '&')
           }).join('?');
           
-          // Clean up the path and navigate properly
-          const cleanPath = decoded.startsWith('/') ? decoded : `/${decoded}`;
+          // Clean up the path and ensure it's valid
+          let cleanPath = decoded.startsWith('/') ? decoded : `/${decoded}`;
+          
+          // Remove any duplicate /flowforge prefixes
+          if (cleanPath.startsWith('/flowforge/')) {
+            cleanPath = cleanPath.substring('/flowforge/'.length);
+            if (!cleanPath.startsWith('/')) {
+              cleanPath = '/' + cleanPath;
+            }
+          }
           
           // Prevent infinite loops by checking if we're already on the right path
-          if (router.pathname !== cleanPath) {
-            console.log('SPA redirect:', cleanPath);
+          if (router.pathname !== cleanPath && cleanPath !== '/') {
+            console.log('SPA redirect:', cleanPath, 'attempt:', redirectAttempts.current);
+            hasProcessedRedirect.current = true;
             router.replace(cleanPath);
+          } else {
+            hasProcessedRedirect.current = true;
           }
         } catch (error) {
           console.error('Error processing SPA redirect:', error);
-          // Fallback: redirect to home page
+          hasProcessedRedirect.current = true;
+          // Fallback: redirect to home page only if not already there
           if (router.pathname !== '/') {
             router.replace('/');
           }
         }
+      } else if (redirectAttempts.current >= 3) {
+        // Prevent infinite loops by stopping after 3 attempts
+        console.warn('Too many redirect attempts, stopping to prevent infinite loop');
+        hasProcessedRedirect.current = true;
       }
     }
   }, [router]);
