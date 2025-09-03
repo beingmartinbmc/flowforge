@@ -53,17 +53,11 @@ export default function Debug() {
           <div className="bg-card p-6 rounded-lg border">
             <h2 className="text-xl font-semibold mb-4">Test Links</h2>
             <div className="space-y-2">
-              <a href={getPath('/')} className="block text-blue-500 hover:underline">
-                Home: {getPath('/')}
-              </a>
               <a href={getPath('/login')} className="block text-blue-500 hover:underline">
                 Login: {getPath('/login')}
               </a>
-              <a href="/flowforge/" className="block text-blue-500 hover:underline">
-                Direct FlowForge: /flowforge/
-              </a>
-              <a href="/flowforge/login" className="block text-blue-500 hover:underline">
-                Direct Login: /flowforge/login
+              <a href={getPath('/')} className="block text-blue-500 hover:underline">
+                Home: {getPath('/')}
               </a>
             </div>
           </div>
