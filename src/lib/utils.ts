@@ -15,5 +15,11 @@ export function getBasePath(): string {
 }
 
 export function getPath(path: string): string {
+  // If we're already on the GitHub Pages domain, don't add the base path
+  // This prevents double /flowforge/flowforge issues
+  if (typeof window !== 'undefined' && window.location.hostname === 'beingmartinbmc.github.io') {
+    return path;
+  }
+  
   return getBasePath() + path;
 }
