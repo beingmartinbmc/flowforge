@@ -4,8 +4,8 @@
     <meta charset="utf-8">
     <title>FlowForge</title>
     <script type="text/javascript">
-      // Comprehensive SPA routing for GitHub Pages
-      // Prevents all malformed URLs and only handles legitimate sub-routes
+      // Ultra-restrictive SPA routing for GitHub Pages
+      // Prevents ALL malformed URLs and only handles legitimate sub-routes
       
       (function() {
         var l = window.location;
@@ -22,10 +22,12 @@
         // 1. We're not already on a query-based URL
         // 2. We have a path that starts with /flowforge/
         // 3. The path is NOT just /flowforge or /flowforge/
+        // 4. The path does NOT contain duplicate /flowforge segments
         if (l.search === '' && 
             path.startsWith('/flowforge/') && 
             path !== '/flowforge/' && 
-            path !== '/flowforge') {
+            path !== '/flowforge' &&
+            !path.includes('/flowforge/flowforge')) {
           
           // Extract the route part after /flowforge/
           var route = path.substring('/flowforge/'.length);
